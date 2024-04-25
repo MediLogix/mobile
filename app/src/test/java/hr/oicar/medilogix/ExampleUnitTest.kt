@@ -1,4 +1,4 @@
-package hr.oicar.medilogix
+package hr.oicar.mediLogix
 
 import org.junit.Test
 
