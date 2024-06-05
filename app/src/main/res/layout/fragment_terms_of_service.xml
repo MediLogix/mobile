@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="@dimen/_20dp"
+    android:background="@color/gray"
+    android:gravity="center"
+    tools:context=".fragment.TermsOfServiceFragment">
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="287dp"
+        android:layout_height="286dp"
+        android:background="@drawable/logo"></ImageView>
+
+    <TextView
+        android:id="@+id/textView"
+        style="@style/Widget.MaterialComponents.TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="134dp"
+        android:text="@string/dobrodosli_u_medilogix_vas_osobni_podsjetnik_za_lijekove_n"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/acceptButton"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/_10dp"
+        android:text="Nastavi"
+        android:textColor="@color/black"
+        app:backgroundTint="@color/white"
+        app:cornerRadius="7sp"
+        app:iconSize="@dimen/_162dp">
+
+    </com.google.android.material.button.MaterialButton>
+
+    <TextView
+        android:id="@+id/termsAndPrivacyTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        android:textStyle="italic"
+        android:layout_marginTop="@dimen/_10dp"
+        android:gravity="center"
+        android:textSize="12sp" />
+
+</LinearLayout>

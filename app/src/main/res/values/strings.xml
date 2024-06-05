@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">MediLogix</string>
+    <string name="please_wait">Please wait</string>
+    <string name="no_internet">No internet...</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_made_by_algebra_students">App made by Algebra students</string>
+    <string name="about">About</string>
+    <string name="items">Items</string>
+    <string name="exit">Exit</string>
+    <string name="really_exit_the_application">Really exit the application?</string>
+    <string name="cancel">Cancel</string>
+    <string name="date">Date</string>
+    <string name="title">Title</string>
+    <string name="explanation">Explanation</string>
+    <string name="dobrodosli_u_medilogix_vas_osobni_podsjetnik_za_lijekove_n">Dobrodosli u MediLogix, Vas osobni podsjetnik za lijekove!\n</string>
+    <string name="e_adresa">E-adresa</string>
+    <string name="lozinka">Lozinka</string>
+    <string name="kreiraj_racun">Kreiraj racun</string>
+    <string name="prijava">Prijava</string>
+    <string name="molimo_vas_unesite_podatke_za_kreiranje_racuna_ili_ako_ste_postojeci_korisnik_prijavite_se">Molimo Vas unesite podatke za kreiranje racuna, ili ako ste postojeci korisnik, prijavite se!</string>
 </resources>

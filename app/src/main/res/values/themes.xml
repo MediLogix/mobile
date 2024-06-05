@@ -1,16 +1,19 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.MediLogix" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+    <style name="Theme.NasaApp" parent="Theme.MaterialComponents.DayNight">
+        <item name="colorPrimary">@color/white</item> <!-- Primary color for the app bar -->
+        <item name="colorPrimaryVariant">@color/black</item> <!-- Variant of primary color -->
+        <item name="colorOnPrimary">@color/black</item> <!-- Text and icon color on primary color -->
+
+        <item name="colorSecondary">@color/gray</item> <!-- Secondary color for components like buttons -->
+        <item name="colorSecondaryVariant">@color/gray</item> <!-- Variant of secondary color -->
+        <item name="colorOnSecondary">@color/black</item> <!-- Text and icon color on secondary color -->
+
+        <item name="android:windowBackground">@color/white</item>
+        <!-- Status bar color -->
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+
     </style>
+
 </resources>
