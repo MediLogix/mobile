@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:startDestination="@id/menuItems"
+    android:id="@+id/fragments">
+
+    <fragment
+        android:id="@+id/menuItems"
+        android:name="hr.algebra.nasaapp.fragment.ItemsFragment"
+        android:label="@string/items"
+        />
+
+    <fragment
+        android:id="@+id/menuAbout"
+        android:name="hr.algebra.nasaapp.fragment.AboutFragment"
+        android:label="@string/about"
+        />
+    <fragment
+        android:id="@+id/menuMedications"
+        android:name="hr.algebra.nasaapp.fragment.MedicationsFragment"
+        android:label="Medication"
+        />
+</navigation>
