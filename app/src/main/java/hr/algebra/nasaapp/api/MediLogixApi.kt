@@ -5,6 +5,7 @@ import hr.algebra.nasaapp.api.auth.MediLogixLoginResponse
 import hr.algebra.nasaapp.api.auth.MediLogixRegistrationRequest
 import hr.algebra.nasaapp.api.auth.MediLogixRegistrationResponse
 import hr.algebra.nasaapp.api.measurements.MediLogixCreateMeasurementRequest
+import hr.algebra.nasaapp.api.measurements.MediLogixCreateMeasurementResponse
 import hr.algebra.nasaapp.api.measurements.MediLogixUpdateMeasurementRequest
 import hr.algebra.nasaapp.api.medications.MediLogixCreateMedicationRequest
 import hr.algebra.nasaapp.api.medications.MediLogixCreateMedicationResponse
@@ -61,7 +62,7 @@ interface MediLogixApi {
 
     // Measurement endpoints
     @POST("measurements")
-    fun createMeasurement(@Body request: MediLogixCreateMeasurementRequest): Call<ResponseBody>
+    fun createMeasurement(@Body request: MediLogixCreateMeasurementRequest): Call<MediLogixCreateMeasurementResponse>
 
     @GET("measurements")
     fun getMeasurements(): Call<ResponseBody>

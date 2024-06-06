@@ -33,7 +33,12 @@
         <activity
             android:name=".CreateMedicationActivity"
             android:exported="false" />
-
+        <activity
+            android:name=".EditMeasurementActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreateMeasurementActivity"
+            android:exported="false" />
         <activity
             android:name=".HostActivity"
             android:exported="false" />

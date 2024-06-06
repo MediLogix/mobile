@@ -9,12 +9,12 @@ import hr.algebra.nasaapp.api.auth.MediLogixLoginResponse
 import hr.algebra.nasaapp.api.auth.MediLogixRegistrationRequest
 import hr.algebra.nasaapp.api.auth.MediLogixRegistrationResponse
 import hr.algebra.nasaapp.api.measurements.MediLogixCreateMeasurementRequest
+import hr.algebra.nasaapp.api.measurements.MediLogixCreateMeasurementResponse
 import hr.algebra.nasaapp.api.measurements.MediLogixGetMeasurementResponse
 import hr.algebra.nasaapp.api.measurements.MediLogixUpdateMeasurementRequest
 import hr.algebra.nasaapp.api.medications.MediLogixCreateMedicationRequest
 import hr.algebra.nasaapp.api.medications.MediLogixCreateMedicationResponse
 import hr.algebra.nasaapp.api.medications.MediLogixDeleteMedicationResponse
-import hr.algebra.nasaapp.api.medications.MediLogixGetMedicationResponse
 import hr.algebra.nasaapp.api.medications.MediLogixUpdateMedicationRequest
 import hr.algebra.nasaapp.api.medications.MediLogixUpdateMedicationResponse
 import hr.algebra.nasaapp.api.parameters.MediLogixCreateParameterRequest
@@ -22,7 +22,9 @@ import hr.algebra.nasaapp.api.parameters.MediLogixCreateParameterResponse
 import hr.algebra.nasaapp.api.parameters.MediLogixGetParameterResponse
 import hr.algebra.nasaapp.api.parameters.MediLogixUpdateParameterRequest
 import hr.algebra.nasaapp.handler.SharedPreferencesHelper
+import hr.algebra.nasaapp.model.Measurement
 import hr.algebra.nasaapp.model.Medication
+import hr.algebra.nasaapp.model.Parameter
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -242,22 +244,57 @@ class MediLogixService {
     }
 
     // Measurement CRUD operations
-    fun createMeasurement(userId: Int, name: String, note: String, onResult: (Boolean, String?) -> Unit) {
-        val request = MediLogixCreateMeasurementRequest(userId, name, note)
-        mediLogixApi.createMeasurement(request).enqueue(object : Callback<ResponseBody> {
-            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+    fun createMeasurement(
+        measurementName: String,
+        note: String,
+        onResult: (Boolean, Int?, String?) -> Unit
+    ) {
+        val request = MediLogixCreateMeasurementRequest(1, measurementName, note)
+        mediLogixApi.createMeasurement(request).enqueue(object : Callback<MediLogixCreateMeasurementResponse> {
+            override fun onResponse(call: Call<MediLogixCreateMeasurementResponse>, response: Response<MediLogixCreateMeasurementResponse>) {
                 if (response.isSuccessful) {
-                    onResult(true, null)
+                    val measurementId = response.body()?._id
+                    if (measurementId != null) {
+                        onResult(true, measurementId.toInt(), null)
+                    } else {
+                        onResult(false, null, "Measurement ID is null")
+                    }
                 } else {
                     val errorBody = response.errorBody()?.string()
-                    onResult(false, errorBody)
+                    onResult(false, null, errorBody)
                 }
             }
 
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                onResult(false, "Network error: ${t.message}. Please try again.")
+            override fun onFailure(call: Call<MediLogixCreateMeasurementResponse>, t: Throwable) {
+                onResult(false, null, "Network error: ${t.message}. Please try again.")
             }
         })
+    }
+    fun createMeasurementWithParameter(
+        measurementName: String,
+        parameterName: String,
+        parameterUnit: String,
+        note: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        // First, create the measurement
+        createMeasurement(measurementName, note) { success, measurementId, errorMessage ->
+            if (success && measurementId != null) {
+                // Measurement created successfully, now create the parameter
+                createParameter(measurementId, parameterName, parameterUnit) { parameterSuccess, parameterErrorMessage ->
+                    if (parameterSuccess) {
+                        // Parameter created successfully
+                        onResult(true, null)
+                    } else {
+                        // Failed to create parameter
+                        onResult(false, parameterErrorMessage ?: "Failed to create parameter")
+                    }
+                }
+            } else {
+                // Failed to create measurement
+                onResult(false, errorMessage ?: "Failed to create measurement")
+            }
+        }
     }
 
     fun getMeasurements(onResult: (Boolean, List<MediLogixGetMeasurementResponse>?, String?) -> Unit) {
@@ -317,10 +354,85 @@ class MediLogixService {
     }
 
     fun deleteMeasurement(measurementId: Int, onResult: (Boolean, String?) -> Unit) {
-        mediLogixApi.deleteMeasurement(measurementId).enqueue(object : Callback<ResponseBody> {
+        // First, delete parameters associated with the measurement
+        deleteParametersForMeasurement(measurementId) { parameterSuccess, parameterErrorMessage ->
+            if (parameterSuccess) {
+                // Parameters deleted successfully, now delete the measurement
+                mediLogixApi.deleteMeasurement(measurementId)
+                    .enqueue(object : Callback<ResponseBody> {
+                        override fun onResponse(
+                            call: Call<ResponseBody>,
+                            response: Response<ResponseBody>
+                        ) {
+                            if (response.isSuccessful) {
+                                onResult(true, null)
+                            } else {
+                                val errorBody = response.errorBody()?.string()
+                                onResult(false, errorBody)
+                            }
+                        }
+
+                        override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                            onResult(
+                                false,
+                                "Network error: ${t.message}. Please try again."
+                            )
+                        }
+                    })
+            } else {
+                // Failed to delete parameters associated with the measurement
+                onResult(false, parameterErrorMessage ?: "Failed to delete parameters")
+            }
+        }
+    }
+
+    private fun deleteParametersForMeasurement(
+        measurementId: Int,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        mediLogixApi.getParameters().enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.isSuccessful) {
-                    onResult(true, null)
+                    val responseBody = response.body()
+                    if (responseBody != null) {
+                        val gson = Gson()
+                        val parameters: List<MediLogixGetParameterResponse> =
+                            gson.fromJson(
+                                responseBody.charStream(),
+                                object : TypeToken<List<MediLogixGetParameterResponse>>() {}.type
+                            )
+                        // Filter parameters associated with the measurement
+                        val parametersToDelete = parameters.filter { it.measurement == measurementId }
+                        // Delete each parameter
+                        parametersToDelete.forEach { parameter ->
+                            mediLogixApi.deleteParameter(parameter._id!!)
+                                .enqueue(object : Callback<ResponseBody> {
+                                    override fun onResponse(
+                                        call: Call<ResponseBody>,
+                                        response: Response<ResponseBody>
+                                    ) {
+                                        if (!response.isSuccessful) {
+                                            val errorBody = response.errorBody()?.string()
+                                            onResult(false, errorBody)
+                                        }
+                                    }
+
+                                    override fun onFailure(
+                                        call: Call<ResponseBody>,
+                                        t: Throwable
+                                    ) {
+                                        onResult(
+                                            false,
+                                            "Network error: ${t.message}. Please try again."
+                                        )
+                                    }
+                                })
+                        }
+                        // All parameters associated with the measurement deleted successfully
+                        onResult(true, null)
+                    } else {
+                        onResult(false, "Response body is null")
+                    }
                 } else {
                     val errorBody = response.errorBody()?.string()
                     onResult(false, errorBody)
@@ -328,14 +440,71 @@ class MediLogixService {
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                onResult(false, "Network error: ${t.message}. Please try again.")
+                onResult(
+                    false,
+                    "Network error: ${t.message}. Please try again."
+                )
             }
         })
     }
+    fun updateMeasurementWithParameter(
+        measurementId: Int,
+        measurementName: String,
+        parameterName: String,
+        parameterUnit: String,
+        note: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        // First, update the measurement
+        updateMeasurement(measurementId, measurementName, note) { success, errorMessage ->
+            if (success) {
+                // Measurement updated successfully, now update the parameter
+                updateParameterForMeasurement(measurementId, parameterName, parameterUnit) { parameterSuccess, parameterErrorMessage ->
+                    if (parameterSuccess) {
+                        // Parameter updated successfully
+                        onResult(true, null)
+                    } else {
+                        // Failed to update parameter
+                        onResult(false, parameterErrorMessage ?: "Failed to update parameter")
+                    }
+                }
+            } else {
+                // Failed to update measurement
+                onResult(false, errorMessage ?: "Failed to update measurement")
+            }
+        }
+    }
+    private fun updateParameterForMeasurement(
+        measurementId: Int,
+        parameterName: String,
+        parameterUnit: String,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        // Retrieve parameters for the given measurement ID
+        getParametersForMeasurement(measurementId) { isSuccess, parameters, error ->
+            if (isSuccess && parameters != null) {
+                // Find the parameter associated with the measurement ID
+                val parameter = parameters.firstOrNull()
 
-    // Parameter CRUD operations
-    fun createParameter(userId: Int, measurementId: Int, name: String, unit: String, onResult: (Boolean, String?) -> Unit) {
-        val request = MediLogixCreateParameterRequest(userId, measurementId, name, unit)
+                if (parameter != null) {
+                    // Update the parameter with the new name and unit
+                    updateParameter(parameter._id!!, parameterName, parameterUnit) { success, errorMessage ->
+                        if (success) {
+                            onResult(true, null)
+                        } else {
+                            onResult(false, errorMessage ?: "Failed to update parameter")
+                        }
+                    }
+                } else {
+                    onResult(false, "Parameter not found for measurement ID: $measurementId")
+                }
+            } else {
+                onResult(false, error ?: "Failed to retrieve parameters")
+            }
+        }
+    }
+    fun createParameter( measurementId: Int, name: String, unit: String, onResult: (Boolean, String?) -> Unit) {
+        val request = MediLogixCreateParameterRequest( measurementId, name, unit)
         mediLogixApi.createParameter(request).enqueue(object : Callback<MediLogixCreateParameterResponse> {
             override fun onResponse(call: Call<MediLogixCreateParameterResponse>, response: Response<MediLogixCreateParameterResponse>) {
                 if (response.isSuccessful) {
@@ -421,6 +590,123 @@ class MediLogixService {
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 onResult(false, "Network error: ${t.message}. Please try again.")
+            }
+        })
+    }
+    fun getMeasurementsWithParameters(onResult: (Boolean, List<Pair<MediLogixGetMeasurementResponse, List<MediLogixGetParameterResponse>>>?, String?) -> Unit) {
+        mediLogixApi.getMeasurements().enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if (response.isSuccessful) {
+                    val gson = Gson()
+                    val measurements: List<MediLogixGetMeasurementResponse> = gson.fromJson(response.body()?.charStream(), object : TypeToken<List<MediLogixGetMeasurementResponse>>() {}.type)
+
+                    // List to hold measurement-parameter pairs
+                    val measurementParameterPairs = mutableListOf<Pair<MediLogixGetMeasurementResponse, List<MediLogixGetParameterResponse>>>()
+
+                    // Iterate over measurements to fetch parameters for each measurement
+                    for (measurement in measurements) {
+                        getParametersForMeasurement(measurement._id!!) { isSuccess, parameters, error ->
+                            if (isSuccess && parameters != null) {
+                                // Filter parameters based on measurement ID
+                                val filteredParameters = parameters.filter { it.measurement == measurement._id }
+                                // Add measurement-parameter pair to the list
+                                measurementParameterPairs.add(Pair(measurement, filteredParameters))
+                                // Check if all measurements have been processed
+                                if (measurementParameterPairs.size == measurements.size) {
+                                    // Call the callback function with the result
+                                    onResult(true, measurementParameterPairs, null)
+                                }
+                            } else {
+                                // Handle error scenario
+                                onResult(false, null, error)
+                                return@getParametersForMeasurement
+                            }
+                        }
+                    }
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    onResult(false, null, errorBody)
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                onResult(false, null, "Network error: ${t.message}. Please try again.")
+            }
+        })
+    }
+
+    private fun getParametersForMeasurement(measurementId: Int, onResult: (Boolean, List<MediLogixGetParameterResponse>?, String?) -> Unit) {
+        mediLogixApi.getParameters().enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+                    if (responseBody != null) {
+                        val gson = Gson()
+                        val parameters: List<MediLogixGetParameterResponse> = gson.fromJson(responseBody.charStream(), object : TypeToken<List<MediLogixGetParameterResponse>>() {}.type)
+                        onResult(true, parameters, null)
+                    } else {
+                        onResult(false, null, "Response body is null")
+                    }
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    onResult(false, null, errorBody)
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                onResult(false, null, "Network error: ${t.message}. Please try again.")
+            }
+        })
+    }
+
+    fun getMeasurementWithParameters(measurementId: Int, onResult: (Boolean, Measurement?, List<Parameter>?, String?) -> Unit) {
+        mediLogixApi.getMeasurement(measurementId).enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if (response.isSuccessful) {
+                    val gson = Gson()
+                    val body = response.body()?.string()
+                    if (body != null) {
+                        val measurementResponse: MediLogixGetMeasurementResponse? = gson.fromJson(body, MediLogixGetMeasurementResponse::class.java)
+                        if (measurementResponse != null) {
+                            // Convert MediLogixGetMeasurementResponse to Measurement
+                            val measurement = Measurement(
+                                measurementResponse._id ?: -1,
+                                measurementResponse.user ?: -1,
+                                measurementResponse.name ?: "",
+                                measurementResponse.note ?: "",
+                                emptyList() // Parameters will be set later
+                            )
+
+                            // Fetch parameters for the measurement
+                            getParametersForMeasurement(measurement.id) { isSuccess, parameterResponses, error ->
+                                if (isSuccess && parameterResponses != null) {
+                                    // Convert MediLogixGetParameterResponse to Parameter
+                                    val parameters = parameterResponses.map { parameterResponse ->
+                                        Parameter(
+                                            parameterResponse._id ?: -1,
+                                            parameterResponse.measurement ?: -1,
+                                            parameterResponse.name ?: "",
+                                            parameterResponse.unit ?: ""
+                                        )
+                                    }
+                                    onResult(true, measurement, parameters, null)
+                                } else {
+                                    onResult(false, null, null, error ?: "Failed to fetch parameters")
+                                }
+                            }
+                            return // Exit onResponse after processing successful response
+                        }
+                    }
+                    // Handle null or invalid response
+                    onResult(false, null, null, "Failed to parse measurement data")
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    onResult(false, null, null, errorBody ?: "Failed to fetch measurement")
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                onResult(false, null, null, "Network error: ${t.message}. Please try again.")
             }
         })
     }

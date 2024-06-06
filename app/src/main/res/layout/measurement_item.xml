@@ -16,12 +16,29 @@
         android:layout_height="wrap_content">
 
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Naziv"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Measurement Name TextView -->
+        <TextView
             android:id="@+id/tvMeasurementName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="?colorOnPrimary"
             android:textSize="24sp"
-            tools:text="Measurement Name" />
+            tools:text="Naziv" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Parametri"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvParameters"
@@ -29,40 +46,44 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"/>
 
+
+
+        <!-- LinearLayout containing Edit and Delete Buttons -->
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginTop="8dp">
-
+            <!-- Edit Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/editButton"
                 style="@style/ButtonStyle.Edit"
-                android:layout_width="48dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_10dp"
                 android:contentDescription="edit"
                 android:padding="@dimen/_10dp"
+                android:text="Edit"
                 android:textColor="@color/black"
                 app:backgroundTint="@color/white"
                 app:cornerRadius="7sp"
                 app:iconSize="@dimen/_20dp" />
-
+            <!-- Delete Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/deleteButton"
                 style="@style/ButtonStyle.Delete"
                 android:layout_marginLeft="@dimen/_20dp"
-                android:layout_width="48dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_10dp"
-                android:contentDescription="@string/delete"
+                android:contentDescription="delete"
                 android:padding="@dimen/_10dp"
+                android:text="Delete"
                 android:textColor="@color/black"
                 app:backgroundTint="@color/white"
                 app:cornerRadius="7sp"
                 app:iconSize="@dimen/_20dp" />
-
         </LinearLayout>
     </LinearLayout>
 

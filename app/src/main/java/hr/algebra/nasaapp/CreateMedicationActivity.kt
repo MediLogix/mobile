@@ -14,6 +14,7 @@ class CreateMedicationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityEditMedicationBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // Set up UI and load medication details
         setupUI()
