@@ -3,13 +3,10 @@ package hr.algebra.nasaapp.api.measurements
 import com.google.gson.annotations.SerializedName
 
 data class MediLogixDeleteMeasurementResponse(
-    @SerializedName("medicationID") val _id: Int?,
-    @SerializedName("userID") val user: Int?,
-    @SerializedName("name") val name: String?,
-    @SerializedName("dosage") val dosage: String?,
-    @SerializedName("unit") val unit: String?,
-    @SerializedName("stash") val stash: String?,
-    @SerializedName("note") val note: String?,
+    @SerializedName("MeasurementID") val _id: Int?,
+    @SerializedName("UserID") val user: Int?,
+    @SerializedName("Name") val name: String?,
+    @SerializedName("Note") val dosage: String?,
     @SerializedName("message") val message: String?,
     @SerializedName("error") val error: String?,
     @SerializedName("statusCode") val statusCode: Int?,

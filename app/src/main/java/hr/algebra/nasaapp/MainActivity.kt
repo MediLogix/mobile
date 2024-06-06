@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun exitApp() {
-        AlertDialog.Builder(this).apply {
+        AlertDialog.Builder(this, R.style.AlertDialogCustomStyle).apply {
             setTitle(R.string.exit)
             setMessage(getString(R.string.really_exit_the_application))
             setIcon(R.drawable.exit)

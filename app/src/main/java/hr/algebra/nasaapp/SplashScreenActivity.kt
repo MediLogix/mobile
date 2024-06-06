@@ -2,12 +2,6 @@ package hr.algebra.nasaapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
-import hr.algebra.nasaapp.api.NasaWorker
 import hr.algebra.nasaapp.databinding.ActivitySplashScreenBinding
 import hr.algebra.nasaapp.framework.applyAnimation
 import hr.algebra.nasaapp.framework.callDelayed
@@ -33,7 +27,7 @@ class SplashScreenActivity : AppCompatActivity() {
     }
 
     private fun startAnimations() {
-        binding.ivSplash.applyAnimation(R.anim.rotate)
+        //binding.ivSplash.applyAnimation(R.anim.rotate)
         binding.tvSplash.applyAnimation(R.anim.blink)
     }
 

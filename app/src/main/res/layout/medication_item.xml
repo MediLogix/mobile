@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:cardUseCompatPadding="true"
+    app:cardCornerRadius="@dimen/_9dp"
+    app:cardBackgroundColor="?colorPrimary"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:padding="@dimen/_10dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="253dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/_20dp"
+            android:gravity="center_vertical"
+            android:textColor="?colorOnPrimary"
+            android:textSize="@dimen/_24sp"
+            tools:text="Picture of the day" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/editButton"
+            style="@style/ButtonStyle.Edit"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10dp"
+            android:contentDescription="edit"
+            android:padding="@dimen/_10dp"
+            android:textColor="@color/black"
+            app:backgroundTint="@color/white"
+            app:cornerRadius="7sp"
+            app:iconSize="@dimen/_20dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/deleteButton"
+            style="@style/ButtonStyle.Delete"
+            android:layout_marginLeft="@dimen/_20dp"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10dp"
+            android:contentDescription="@string/delete"
+            android:padding="@dimen/_10dp"
+            android:textColor="@color/black"
+            app:backgroundTint="@color/white"
+            app:cornerRadius="7sp"
+            app:iconSize="@dimen/_20dp" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

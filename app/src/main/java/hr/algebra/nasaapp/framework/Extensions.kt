@@ -13,11 +13,7 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import androidx.core.content.getSystemService
 import androidx.preference.PreferenceManager
-import hr.algebra.nasaapp.MEDILOGIX_PROVIDER_CONTENT_URI
-import hr.algebra.nasaapp.NASA_PROVIDER_CONTENT_URI
-import hr.algebra.nasaapp.model.Item
-import hr.algebra.nasaapp.model.Medication
-import hr.algebra.nasaapp.model.Reminder
+
 
 fun View.applyAnimation(animationId: Int) =
     startAnimation(AnimationUtils.loadAnimation(context, animationId))
@@ -63,48 +59,4 @@ fun Context.isOnline() : Boolean {
         }
     }
     return false
-}
-
-@SuppressLint("Range")
-fun Context.fetchItems() : MutableList<Item> {
-    val items = mutableListOf<Item>()
-
-    val cursor = contentResolver.query(
-        NASA_PROVIDER_CONTENT_URI, null, null, null, null
-    )
-    while (cursor != null && cursor.moveToNext()){
-        items.add(Item(
-            cursor.getLong(cursor.getColumnIndexOrThrow(Item::_id.name)),
-            cursor.getString(cursor.getColumnIndexOrThrow(Item::title.name)),
-            cursor.getString(cursor.getColumnIndexOrThrow(Item::explanation.name)),
-            cursor.getString(cursor.getColumnIndexOrThrow(Item::picturePath.name)),
-            cursor.getString(cursor.getColumnIndexOrThrow(Item::date.name)),
-            cursor.getInt(cursor.getColumnIndexOrThrow(Item::read.name))==1
-        ))
-    }
-
-    return items
-}
-
-@SuppressLint("Range")
-fun Context.fetchMedications(userId : Int) : MutableList<Medication> {
-    val medications = mutableListOf<Medication>()
-
-    val cursor = contentResolver.query(
-        MEDILOGIX_PROVIDER_CONTENT_URI, null, null, null, null
-    )
-    while (cursor != null && cursor.moveToNext()){
-        if (cursor.getInt(cursor.getColumnIndexOrThrow(Medication::_id.name)) == userId){
-        medications.add(Medication(
-            cursor.getInt(cursor.getColumnIndexOrThrow(Medication::_id.name)),
-            cursor.getInt(cursor.getColumnIndexOrThrow(Medication::user.name)),
-            cursor.getString(cursor.getColumnIndexOrThrow(Medication::name.name)),
-            cursor.getDouble(cursor.getColumnIndexOrThrow(Medication::dosage.name)),
-            cursor.getString(cursor.getColumnIndexOrThrow(Medication::note.name)),
-            cursor.getDouble(cursor.getColumnIndexOrThrow(Medication::stash.name)),
-            cursor.getString(cursor.getColumnIndexOrThrow(Medication::note.name)),
-        ))}
-    }
-
-    return medications
 }

@@ -15,5 +15,16 @@
         <item name="android:windowLightStatusBar">true</item>
 
     </style>
+    <style name="ButtonStyle.Delete" parent="Widget.MaterialComponents.Button">
+        <item name="icon">@drawable/ic_trash</item>
+    </style>
+
+    <style name="ButtonStyle.Edit" parent="Widget.MaterialComponents.Button">
+        <item name="icon">@drawable/ic_edit</item>
+    </style>
+    <style name="AlertDialogCustomStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <!-- Customize text color -->
+        <item name="android:textColor">@android:color/black</item>
+    </style>
 
 </resources>

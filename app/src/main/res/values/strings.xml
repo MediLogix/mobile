@@ -19,4 +19,6 @@
     <string name="kreiraj_racun">Kreiraj racun</string>
     <string name="prijava">Prijava</string>
     <string name="molimo_vas_unesite_podatke_za_kreiranje_racuna_ili_ako_ste_postojeci_korisnik_prijavite_se">Molimo Vas unesite podatke za kreiranje racuna, ili ako ste postojeci korisnik, prijavite se!</string>
+    <string name="delete">delete</string>
+    <string name="create">create</string>
 </resources>

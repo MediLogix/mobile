@@ -1,11 +1,13 @@
 package hr.algebra.nasaapp.model
 
+import com.google.gson.annotations.SerializedName
+
 data class Medication (
-    val _id: Int?,
-    val user: Int,
-    val name: String,
-    val dosage: Double,
-    val unit: String,
-    val stash: Double,
-    val note: String
+    @SerializedName("MedicationID") val _id: Int?,
+    @SerializedName("UserID") val user: Int?,
+    @SerializedName("Name") val name: String?,
+    @SerializedName("Dosage") val dosage: Double?,
+    @SerializedName("Unit") val unit: String?,
+    @SerializedName("Stash") val stash: Int?,
+    @SerializedName("Note") val note: String?,
 )

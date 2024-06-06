@@ -1,8 +1,8 @@
 package hr.algebra.nasaapp.model
 
 data class Parameter(
-    val _id: Int?,
-    val measurement: Int,
+    val id: Int,
+    val measurementId: Int,
     val name: String,
     val unit: String
 )
